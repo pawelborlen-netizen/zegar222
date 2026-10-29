@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Wie spät ist es? - Mistrz Zegara Niemieckiego</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #0f172a;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #8b5cf6;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --radius: 14px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 10px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      padding: 16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand p {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-online {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      border: 1px solid #22c55e;
+    }
+
+    .status-offline {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid #ef4444;
+    }
+
+    /* Tabs Navigation */
+    .tabs-nav {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+
+    .tab-button {
+      border: none;
+      background: transparent;
+      padding: 10px 2px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .tab-button.active {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Panels */
+    .tab-panel {
+      display: none;
+      background: var(--surface);
+      padding: 16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .tab-panel.active {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Clock SVG */
+    .clock-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .svg-clock {
+      width: 175px;
+      height: 175px;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.12));
+    }
+
+    .digital-time {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--secondary);
+      background: #f1f5f9;
+      padding: 4px 16px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* Selectors */
+    .time-control-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .select-group label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    select, input[type="text"] {
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    /* Quick Preset Chips */
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .chip-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip-btn:hover, .chip-btn:active {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+    }
+
+    /* Results */
+    .result-card {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      position: relative;
+    }
+
+    .result-card.casual {
+      border-left-color: var(--accent);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .card-text {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+      padding-right: 36px;
+    }
+
+    .card-subtext {
+      font-size: 0.82rem;
+      color: #475569;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    .speak-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .speak-btn:active {
+      transform: translateY(-50%) scale(0.92);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 16px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      transition: background-color 0.15s;
+      width: 100%;
+    }
+
+    .btn:active {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      width: auto;
+    }
+
+    /* Virtual word chips for Text->Time */
+    .word-keyboard {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+      justify-content: center;
+    }
+
+    .word-key {
+      background: #e2e8f0;
+      border: 1px solid #cbd5e1;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .word-key:active {
+      background: #cbd5e1;
+    }
+
+    /* Quiz Module */
+    .quiz-box {
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .quiz-tag {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .quiz-prompt {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin: 8px 0;
+      color: var(--secondary);
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .opt-btn {
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .opt-btn.correct {
+      background: var(--success-bg) !important;
+      border-color: var(--success) !important;
+      color: #14532d;
+    }
+
+    .opt-btn.incorrect {
+      background: var(--danger-bg) !important;
+      border-color: var(--danger) !important;
+      color: #7f1d1d;
+    }
+
+    .feedback-alert {
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Test Table */
+    .autotest-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      margin-top: 8px;
+    }
+
+    .autotest-table th, .autotest-table td {
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    .autotest-table th {
+      background: #f1f5f9;
+      font-weight: 800;
+    }
+
+    .badge-ok {
+      background: var(--success-bg);
+      color: var(--success);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
+    .badge-err {
+      background: var(--danger-bg);
+      color: var(--danger);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
+    /* Print View */
+    @media print {
+      body { background: white; padding: 0; }
+      header, .tabs-nav, .chips-grid, .word-keyboard, .btn, .time-control-row, #onlineStatus { display: none !important; }
+      .app-container { max-width: 100%; }
+      .tab-panel { display: block !important; border: 1px solid #000; box-shadow: none; margin-bottom: 20px; page-break-inside: avoid; }
+      .result-card { border: 1px solid #999 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <header>
+    <div class="brand">
+      <h1>⏰ Uhrzeit Trainer</h1>
+      <p>Która godzina po niemiecku? • Trener na kartkówkę</p>
+    </div>
+    <div id="onlineStatus" class="status-badge status-offline">Łączenie...</div>
+  </header>
+
+  <!-- Zakładki -->
+  <nav class="tabs-nav">
+    <button class="tab-button active" data-tab="tab-clock">Zegar</button>
+    <button class="tab-button" data-tab="tab-text">Tekst➔Czas</button>
+    <button class="tab-button" data-tab="tab-quiz">Kartkówka</button>
+    <button class="tab-button" data-tab="tab-test">Autotest</button>
+  </nav>
+
+  <!-- PANEL 1: ZEGAR (CZAS -> TEKST) -->
+  <main id="tab-clock" class="tab-panel active">
+    <div class="clock-display">
+      <svg id="svgClock" class="svg-clock" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="#ffffff" stroke="#334155" stroke-width="8"/>
+        <!-- Tarcza liczb -->
+        <g id="clockNumbers" font-size="14" font-weight="bold" fill="#475569" text-anchor="middle" dominant-baseline="central"></g>
+        <!-- Wskazówki -->
+        <line id="hourHandLine" x1="100" y1="100" x2="100" y2="52" stroke="#0f172a" stroke-width="6" stroke-linecap="round"/>
+        <line id="minuteHandLine" x1="100" y1="100" x2="100" y2="30" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="5" fill="#dc2626"/>
+      </svg>
+      <div class="digital-time" id="digitalClockDisplay">08:00</div>
+    </div>
+
+    <!-- Kontrolery czasu -->
+    <div class="time-control-row">
+      <div class="select-group">
+        <label for="hourSelect">Godzina</label>
+        <select id="hourSelect"></select>
+      </div>
+      <span style="font-size: 1.4rem; font-weight: 800; margin-top: 14px;">:</span>
+      <div class="select-group">
+        <label for="minuteSelect">Minuty</label>
+        <select id="minuteSelect"></select>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btnNow" style="margin-top: 16px; height: 38px;">Teraz</button>
+    </div>
+
+    <!-- Szybkie przykłady z kartkówek -->
+    <div class="chips-grid">
+      <button class="chip-btn" data-h="8" data-m="0">08:00</button>
+      <button class="chip-btn" data-h="8" data-m="15">08:15 (Viertel nach)</button>
+      <button class="chip-btn" data-h="8" data-m="25">08:25 (vor halb)</button>
+      <button class="chip-btn" data-h="8" data-m="30">08:30 (halb)</button>
+      <button class="chip-btn" data-h="8" data-m="35">08:35 (nach halb)</button>
+      <button class="chip-btn" data-h="8" data-m="45">08:45 (Viertel vor)</button>
+    </div>
+
+    <!-- Wyniki -->
+    <div class="result-card">
+      <div class="card-header">
+        <span>1. Styl Oficjalny (24h)</span>
+        <span style="color:var(--primary);">Dworzec / TV / Radio</span>
+      </div>
+      <div class="card-text" id="officialOutput">Es ist acht Uhr</div>
+      <button class="speak-btn" id="speakOfficialBtn" title="Posłuchaj wymowy">🔊</button>
+    </div>
+
+    <div class="result-card casual">
+      <div class="card-header">
+        <span>2. Styl Potoczny (12h)</span>
+        <span style="color:var(--accent);">Codzienne rozmowy</span>
+      </div>
+      <div class="card-text" id="casualOutput">Es ist acht</div>
+      <div class="card-subtext" id="casualSubOutput"></div>
+      <button class="speak-btn" id="speakCasualBtn" title="Posłuchaj wymowy">🔊</button>
+    </div>
+  </main>
+
+  <!-- PANEL 2: TEKST DO CZASU (WPROWADZANIE) -->
+  <section id="tab-text" class="tab-panel">
+    <div style="font-size: 0.85rem; color: #475569;">
+      Wpisz lub ułóż zdanie niemieckie (np. <i>Viertel nach drei</i>, <i>halb fünf</i>, <i>fünf vor halb acht</i> lub <i>zwölf Uhr zwanzig</i>):
+    </div>
+
+    <input type="text" id="textInputGerman" placeholder="Wpisz po niemiecku...">
+
+    <!-- Klawiatura pomocnicza na telefon -->
+    <div class="word-keyboard" id="wordChips">
+      <span class="word-key" data-word="Es ist">Es ist</span>
+      <span class="word-key" data-word="Uhr">Uhr</span>
+      <span class="word-key" data-word="halb">halb</span>
+      <span class="word-key" data-word="Viertel">Viertel</span>
+      <span class="word-key" data-word="nach">nach</span>
+      <span class="word-key" data-word="vor">vor</span>
+      <span class="word-key" data-word="fünf">fünf</span>
+      <span class="word-key" data-word="zehn">zehn</span>
+      <span class="word-key" data-word="zwanzig">zwanzig</span>
+      <span class="word-key" data-word="eins">eins</span>
+      <span class="word-key" data-word="zwei">zwei</span>
+      <span class="word-key" data-word="drei">drei</span>
+      <span class="word-key" data-word="vier">vier</span>
+      <span class="word-key" data-word="acht">acht</span>
+      <span class="word-key" data-word="zwölf">zwölf</span>
+      <span class="word-key" id="clearWordInput" style="background:#fecaca; color:#991b1b;">Wyczyść ✕</span>
+    </div>
+
+    <button class="btn" id="btnParseText">Sprawdź i ustaw zegar</button>
+
+    <div id="parseResultBox" style="display:none;" class="result-card">
+      <div class="card-header">Rozpoznano godzinę:</div>
+      <div style="font-size:1.8rem; font-weight:900; color:var(--primary); text-align:center;" id="parsedDigitalVal">--:--</div>
+      <div id="parsedExplanationVal" style="font-size:0.85rem; text-align:center; margin-top:4px; color:#475569;"></div>
+    </div>
+  </section>
+
+  <!-- PANEL 3: KARTKÓWKA / QUIZ -->
+  <section id="tab-quiz" class="tab-panel">
+    <div style="display: flex; justify-content: space-between; align-items:center; font-size:0.85rem; font-weight:800; background:#f1f5f9; padding:8px 12px; border-radius:8px;">
+      <span>Wynik: <span id="quizScoreText" style="color:var(--primary);">0/0</span></span>
+      <span>Seria (Streak): <span id="quizStreakText" style="color:var(--accent);">🔥 0</span></span>
+      <button class="btn btn-secondary btn-sm" id="btnPrintTest" style="padding:3px 8px;">Drukuj 📄</button>
+    </div>
+
+    <div class="quiz-box">
+      <span class="quiz-tag" id="quizModeBadge">Styl Potoczny</span>
+      <div class="quiz-prompt" id="quizTimePrompt">07:30</div>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Która odpowiedź jest prawidłowa?</p>
+
+      <div class="quiz-options" id="quizOptionsContainer"></div>
+      <div id="quizFeedbackBox" class="feedback-alert"></div>
+    </div>
+
+    <button class="btn btn-secondary" id="btnNextQuiz">Następne pytanie ➔</button>
+  </section>
+
+  <!-- PANEL 4: AUTOTEST SILNIKA I REGUŁY -->
+  <section id="tab-test" class="tab-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-size:0.95rem; font-weight:800;">Weryfikacja Silnika Językowego</h3>
+      <button class="btn btn-sm" id="btnRunTests">Uruchom autotest</button>
+    </div>
+    <div style="font-size:0.8rem; color:var(--text-muted);" id="testMetaInfo">
+      Kliknij przycisk, aby przetestować 26 reguł gramatycznych i parsera.
+    </div>
+
+    <div style="overflow-x:auto; max-height:280px; overflow-y:auto; border:1px solid var(--border); border-radius:8px;">
+      <table class="autotest-table">
+        <thead>
+          <tr>
+            <th>Wejście</th>
+            <th>Typ</th>
+            <th>Oczekiwany</th>
+            <th>Otrzymany</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="testTableBody">
+          <tr><td colspan="5" style="text-align:center; color:#94a3b8;">Brak danych testowych.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Skrócona ściąga zasad -->
+    <div style="font-size:0.8rem; color:#334155; line-height:1.4; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid var(--border);">
+      <b>Zasady na 5+ z kartkówki:</b><br>
+      • <b>halb:</b> oznacza wpół do KOLEJNEJ godziny (np. <i>halb acht</i> = 7:30).<br>
+      • <b>ein Uhr</b> vs <b>eins:</b> 1:00 oficjalnie to <i>ein Uhr</i> (bez 's'), a potocznie <i>eins</i>.<br>
+      • <b>25 i 35:</b> <i>fünf vor halb...</i> oraz <i>fünf nach halb...</i>.
+    </div>
+  </section>
+</div>
+
+<script>
+/**
+ * =========================================================================
+ * BAZA DANYCH I REGUŁY JĘZYKA NIEMIECKIEGO
+ * =========================================================================
+ */
+const DE_NUMBERS = {
+  0: "null", 1: "eins", 2: "zwei", 3: "drei", 4: "vier", 5: "fünf",
+  6: "sechs", 7: "sieben", 8: "acht", 9: "neun", 10: "zehn",
+  11: "elf", 12: "zwölf", 13: "dreizehn", 14: "vierzehn", 15: "fünfzehn",
+  16: "sechzehn", 17: "siebzehn", 18: "achtzehn", 19: "neunzehn", 20: "zwanzig",
+  21: "einundzwanzig", 22: "zweiundzwanzig", 23: "dreiundzwanzig", 24: "vierundzwanzig",
+  25: "fünfundzwanzig", 26: "sechsundzwanzig", 27: "siebenundzwanzig", 28: "achtundzwanzig",
+  29: "neunundzwanzig", 30: "dreißig", 31: "einunddreißig", 32: "zweiunddreißig",
+  33: "dreiunddreißig", 34: "vierunddreißig", 35: "fünfunddreißig", 36: "sechsunddreißig",
+  37: "siebenunddreißig", 38: "achtunddreißig", 39: "neununddreißig", 40: "vierzig",
+  41: "einundvierzig", 42: "zweiundvierzig", 43: "dreiundvierzig", 44: "vierundvierzig",
+  45: "fünfundvierzig", 46: "sechsundvierzig", 47: "siebenundvierzig", 48: "achtundvierzig",
+  49: "neunundvierzig", 50: "fünfzig", 51: "einundfünfzig", 52: "zweiundfünfzig",
+  53: "dreiundfünfzig", 54: "vierundfünfzig", 55: "fünfundfünfzig", 56: "sechsundfünfzig",
+  57: "siebenundfünfzig", 58: "achtundfünfzig", 59: "neunundfünfzig"
+};
+
+const WORDS_TO_NUM = {};
+for (const [k, v] of Object.entries(DE_NUMBERS)) {
+  WORDS_TO_NUM[v] = parseInt(k, 10);
+}
+WORDS_TO_NUM["ein"] = 1;
+
+/**
+ * Zwraca czas w stylu oficjalnym (24h)
+ */
+function toOfficialGerman(h, m) {
+  let hourWord = DE_NUMBERS[h];
+  if (h === 1) hourWord = "ein"; // 1:00 to "ein Uhr", NIE "eins Uhr"
+
+  if (m === 0) {
+    return `Es ist ${hourWord} Uhr`;
+  }
+  return `Es ist ${hourWord} Uhr ${DE_NUMBERS[m]}`;
+}
+
+/**
+ * Zwraca czas w stylu potocznym (12h)
+ */
+function toCasualGerman(h, m) {
+  let h12 = h % 12;
+  if (h12 === 0) h12 = 12;
+
+  let next12 = (h + 1) % 12;
+  if (next12 === 0) next12 = 12;
+
+  const curWord = (h12 === 1) ? "eins" : DE_NUMBERS[h12];
+  const nextWord = (next12 === 1) ? "eins" : DE_NUMBERS[next12];
+
+  if (m === 0) {
+    return {
+      main: `Es ist ${curWord}`,
+      sub: h12 === 1 ? "(lub: Es ist ein Uhr)" : `(lub: Es ist ${curWord} Uhr)`
+    };
+  }
+  if (m === 15) {
+    return { main: `Es ist Viertel nach ${curWord}`, sub: "" };
+  }
+  if (m === 45) {
+    return { main: `Es ist Viertel vor ${nextWord}`, sub: "" };
+  }
+  if (m === 30) {
+    return { main: `Es ist halb ${nextWord}`, sub: "Uwaga: 'halb' odnosi się do kolejnej godziny!" };
+  }
+  if (m === 25) {
+    return { main: `Es ist fünf vor halb ${nextWord}`, sub: `(rzadziej: fünfundzwanzig nach ${curWord})` };
+  }
+  if (m === 35) {
+    return { main: `Es ist fünf nach halb ${nextWord}`, sub: `(rzadziej: fünfundzwanzig vor ${nextWord})` };
+  }
+  if (m === 20) {
+    return { main: `Es ist zwanzig nach ${curWord}`, sub: `(potocznie też: zehn vor halb ${nextWord})` };
+  }
+  if (m === 40) {
+    return { main: `Es ist zwanzig vor ${nextWord}`, sub: `(potocznie też: zehn nach halb ${nextWord})` };
+  }
+  if (m < 30) {
+    return { main: `Es ist ${DE_NUMBERS[m]} nach ${curWord}`, sub: "" };
+  } else {
+    return { main: `Es ist ${DE_NUMBERS[60 - m]} vor ${nextWord}`, sub: "" };
+  }
+}
+
+/**
+ * Parser frazy tekstowej do obiektu czasu
+ */
+function parseGermanTimePhrase(phrase) {
+  let str = phrase.toLowerCase().trim()
+    .replace(/^es\s+ist\s+/, '')
+    .replace(/[.,!?]/g, '')
+    .trim();
+
+  if (!str) return null;
+
+  // 1. Oficjalny format: X Uhr / X Uhr Y
+  if (str.includes("uhr")) {
+    const parts = str.split(/\s+uhr\s*/);
+    const hWord = parts[0].trim();
+    const mWord = (parts[1] || "").trim();
+
+    const h = WORDS_TO_NUM[hWord];
+    if (h === undefined || h < 0 || h > 24) return null;
+
+    let m = 0;
+    if (mWord) {
+      m = WORDS_TO_NUM[mWord];
+      if (m === undefined || m < 0 || m > 59) return null;
+    }
+    return { hour: h === 24 ? 0 : h, minute: m, mode: "Oficjalny (24h)" };
+  }
+
+  // 2. Potoczny: fünf vor halb X
+  let mRes = str.match(/^fünf\s+vor\s+halb\s+([a-zäöüß]+)$/);
+  if (mRes) {
+    const nextH = WORDS_TO_NUM[mRes[1]];
+    if (nextH !== undefined) return { hour: (nextH - 1 + 24) % 24, minute: 25, mode: "Potoczny (25 po)" };
+  }
+
+  // 3. Potoczny: fünf nach halb X
+  mRes = str.match(/^fünf\s+nach\s+halb\s+([a-zäöüß]+)$/);
+  if (mRes) {
+    const nextH = WORDS_TO_NUM[mRes[1]];
+    if (nextH !== undefined) return { hour: (nextH - 1 + 24) % 24, minute: 35, mode: "Potoczny (35 po)" };
+  }
+
+  // 4. Potoczny: halb X
+  mRes = str.match(/^halb\s+([a-zäöüß]+)$/);
+  if (mRes) {
+    const nextH = WORDS_TO_NUM[mRes[1]];
+    if (nextH !== undefined) return { hour: (nextH - 1 + 24) % 24, minute: 30, mode: "Potoczny (wpół do)" };
+  }
+
+  // 5. Potoczny: Viertel nach / vor X
+  mRes = str.match(/^viertel\s+(vor|nach)\s+([a-zäöüß]+)$/);
+  if (mRes) {
+    const dir = mRes[1];
+    const targetH = WORDS_TO_NUM[mRes[2]];
+    if (targetH !== undefined) {
+      if (dir === "nach") return { hour: targetH % 24, minute: 15, mode: "Potoczny (kwadrans po)" };
+      return { hour: (targetH - 1 + 24) % 24, minute: 45, mode: "Potoczny (kwadrans przed)" };
+    }
+  }
+
+  // 6. Potoczny: [minuty] nach / vor [godzina]
+  mRes = str.match(/^([a-zäöüß]+)\s+(vor|nach)\s+([a-zäöüß]+)$/);
+  if (mRes) {
+    const minVal = WORDS_TO_NUM[mRes[1]];
+    const dir = mRes[2];
+    const hourVal = WORDS_TO_NUM[mRes[3]];
+    if (minVal !== undefined && hourVal !== undefined && minVal > 0 && minVal < 60) {
+      if (dir === "nach") return { hour: hourVal % 24, minute: minVal, mode: "Potoczny (nach)" };
+      return { hour: (hourVal - 1 + 24) % 24, minute: 60 - minVal, mode: "Potoczny (vor)" };
+    }
+  }
+
+  // 7. Sama liczba pojedyncza (np. "drei", "eins")
+  if (WORDS_TO_NUM[str] !== undefined) {
+    return { hour: WORDS_TO_NUM[str] % 24, minute: 0, mode: "Potoczny (pełna)" };
+  }
+
+  return null;
+}
+
+/**
+ * =========================================================================
+ * ZARZĄDZANIE INTERFEJSEM I STABILNOŚCIĄ APLIKACJI
+ * =========================================================================
+ */
+let quizState = {
+  score: 0,
+  total: 0,
+  streak: 0,
+  currentH: 0,
+  currentM: 0,
+  correctText: "",
+  isAnswered: false
+};
+
+// Inicjalizacja cyfr na zegarze SVG
+function renderClockNumbers() {
+  const g = document.getElementById("clockNumbers");
+  g.innerHTML = "";
+  for (let i = 1; i <= 12; i++) {
+    const angle = (i * 30 - 90) * (Math.PI / 180);
+    const x = 100 + 72 * Math.cos(angle);
+    const y = 100 + 72 * Math.sin(angle);
+    const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textNode.setAttribute("x", x);
+    textNode.setAttribute("y", y);
+    textNode.textContent = i;
+    g.appendChild(textNode);
+  }
+}
+
+// Inicjalizacja selektorów godzin i minut
+function populateTimeDropdowns() {
+  const hSel = document.getElementById("hourSelect");
+  const mSel = document.getElementById("minuteSelect");
+  hSel.innerHTML = "";
+  mSel.innerHTML = "";
+
+  for (let h = 0; h < 24; h++) {
+    const opt = document.createElement("option");
+    opt.value = h;
+    opt.textContent = h < 10 ? "0" + h : h;
+    hSel.appendChild(opt);
+  }
+  for (let m = 0; m < 60; m++) {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = m < 10 ? "0" + m : m;
+    mSel.appendChild(opt);
+  }
+}
+
+// Bezpieczne i stabilne przełączanie zakładek
+function setupTabs() {
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const panels = document.querySelectorAll(".tab-panel");
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-tab");
+
+      tabButtons.forEach(b => b.classList.remove("active"));
+      panels.forEach(p => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) {
+        targetPanel.classList.add("active");
+      }
+
+      // Jeżeli przełączamy na quiz i nie ma pytania, zainicjuj je
+      if (targetId === "tab-quiz" && !quizState.correctText) {
+        generateNewQuizQuestion();
+      }
+    });
+  });
+}
+
+// Aktualizacja zegara SVG i tekstów
+function updateClockState(h, m) {
+  const hLine = document.getElementById("hourHandLine");
+  const mLine = document.getElementById("minuteHandLine");
+  const digital = document.getElementById("digitalClockDisplay");
+
+  const hDeg = (h % 12) * 30 + m * 0.5;
+  const mDeg = m * 6;
+
+  hLine.setAttribute("transform", `rotate(${hDeg} 100 100)`);
+  mLine.setAttribute("transform", `rotate(${mDeg} 100 100)`);
+
+  const hStr = h < 10 ? "0" + h : h;
+  const mStr = m < 10 ? "0" + m : m;
+  digital.textContent = `${hStr}:${mStr}`;
+
+  // Oficjalny
+  const offText = toOfficialGerman(h, m);
+  document.getElementById("officialOutput").textContent = offText;
+
+  // Potoczny
+  const casObj = toCasualGerman(h, m);
+  document.getElementById("casualOutput").textContent = casObj.main;
+  document.getElementById("casualSubOutput").textContent = casObj.sub;
+}
+
+function handleTimeSelectChange() {
+  const h = parseInt(document.getElementById("hourSelect").value, 10);
+  const m = parseInt(document.getElementById("minuteSelect").value, 10);
+  updateClockState(h, m);
+}
+
+function setAppTime(h, m) {
+  document.getElementById("hourSelect").value = h;
+  document.getElementById("minuteSelect").value = m;
+  updateClockState(h, m);
+}
+
+// Monitorowanie Online/Offline
+function updateNetworkStatus() {
+  const badge = document.getElementById("onlineStatus");
+  if (navigator.onLine) {
+    badge.textContent = "● Online (Audio ON)";
+    badge.className = "status-badge status-online";
+  } else {
+    badge.textContent = "○ Offline (Działa)";
+    badge.className = "status-badge status-offline";
+  }
+}
+
+// Synteza mowy (Wymowa niemiecka z Web Speech API)
+function speakGerman(text) {
+  if (!('speechSynthesis' in window)) {
+    alert("Twoja przeglądarka nie obsługuje syntezy mowy.");
+    return;
+  }
+  window.speechSynthesis.cancel(); // zatrzymaj poprzednie
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "de-DE";
+  utterance.rate = 0.85; // wolniejsza, wyraźna wymowa do nauki
+
+  // Próba znalezienia natywnego głosu niemieckiego
+  const voices = window.speechSynthesis.getVoices();
+  const deVoice = voices.find(v => v.lang.startsWith("de"));
+  if (deVoice) utterance.voice = deVoice;
+
+  window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * =========================================================================
+ * LOGIKA QUIZU / KARTKÓWKI (ODPORNA NA PĘTLE I ZAWIESZENIA)
+ * =========================================================================
+ */
+function generateNewQuizQuestion() {
+  const feedback = document.getElementById("quizFeedbackBox");
+  feedback.style.display = "none";
+  quizState.isAnswered = false;
+
+  const validMinutes = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+  const h = Math.floor(Math.random() * 24);
+  const m = validMinutes[Math.floor(Math.random() * validMinutes.length)];
+  const isCasual = Math.random() > 0.4;
+
+  quizState.currentH = h;
+  quizState.currentM = m;
+
+  const hStr = h < 10 ? "0" + h : h;
+  const mStr = m < 10 ? "0" + m : m;
+  document.getElementById("quizTimePrompt").textContent = `${hStr}:${mStr}`;
+  document.getElementById("quizModeBadge").textContent = isCasual ? "Styl Potoczny (Umgangssprache)" : "Styl Oficjalny (Offiziell)";
+
+  const correct = isCasual ? toCasualGerman(h, m).main : toOfficialGerman(h, m);
+  quizState.correctText = correct;
+
+  // Generowanie opcji bez nieskończonych pętli (ograniczone iteracje)
+  const optionsSet = new Set([correct]);
+  let guard = 0;
+
+  while (optionsSet.size < 4 && guard < 30) {
+    guard++;
+    const fakeH = (h + Math.floor(Math.random() * 5) - 2 + 24) % 24;
+    const fakeM = validMinutes[Math.floor(Math.random() * validMinutes.length)];
+    const fakeOption = isCasual ? toCasualGerman(fakeH, fakeM).main : toOfficialGerman(fakeH, fakeM);
+    optionsSet.add(fakeOption);
+  }
+
+  // Wypełnienie awaryjne w razie małej puli
+  if (optionsSet.size < 4) {
+    optionsSet.add(isCasual ? "Es ist halb zehn" : "Es ist zehn Uhr");
+    optionsSet.add(isCasual ? "Es ist Viertel nach elf" : "Es ist elf Uhr fünfzehn");
+    optionsSet.add(isCasual ? "Es ist zwanzig vor eins" : "Es ist zwölf Uhr vierzig");
+  }
+
+  const optionsArr = Array.from(optionsSet).slice(0, 4);
+  optionsArr.sort(() => Math.random() - 0.5);
+
+  const container = document.getElementById("quizOptionsContainer");
+  container.innerHTML = "";
+
+  optionsArr.forEach(text => {
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.textContent = text;
+    btn.onclick = () => handleQuizAnswer(btn, text, isCasual);
+    container.appendChild(btn);
+  });
+}
+
+function handleQuizAnswer(btn, chosenText, isCasual) {
+  if (quizState.isAnswered) return;
+  quizState.isAnswered = true;
+
+  quizState.total++;
+  const isCorrect = (chosenText === quizState.correctText);
+
+  if (isCorrect) {
+    quizState.score++;
+    quizState.streak++;
+  } else {
+    quizState.streak = 0;
+  }
+
+  document.getElementById("quizScoreText").textContent = `${quizState.score}/${quizState.total}`;
+  document.getElementById("quizStreakText").textContent = `🔥 ${quizState.streak}`;
+
+  const feedback = document.getElementById("quizFeedbackBox");
+  feedback.style.display = "block";
+
+  // Podświetlenie odpowiedzi
+  const allBtns = document.querySelectorAll(".opt-btn");
+  allBtns.forEach(b => {
+    if (b.textContent === quizState.correctText) {
+      b.classList.add("correct");
+    } else if (b === btn && !isCorrect) {
+      b.classList.add("incorrect");
+    }
+  });
+
+  if (isCorrect) {
+    feedback.style.background = "var(--success-bg)";
+    feedback.style.color = "#14532d";
+    feedback.innerHTML = `<b>Gut gemacht! Dobra robota!</b> Prawidłowa forma: <i>${quizState.correctText}</i>`;
+  } else {
+    feedback.style.background = "var(--danger-bg)";
+    feedback.style.color = "#7f1d1d";
+    let explanation = "Pamiętaj o regułach podawania czasu!";
+    if (isCasual && quizState.currentM === 30) explanation = "Zasada 'halb': odnosi się do godziny, która nadejdzie!";
+    if (isCasual && quizState.currentM === 15) explanation = "Kwadrans po danej godzinie to zawsze 'Viertel nach'.";
+    if (isCasual && quizState.currentM === 45) explanation = "Kwadrans przed kolejną godziną to 'Viertel vor'.";
+    feedback.innerHTML = `<b>Niepoprawnie!</b> Prawidłowo: <b>${quizState.correctText}</b>.<br><small>${explanation}</small>`;
+  }
+}
+
+/**
+ * =========================================================================
+ * AUTOTEST SILNIKA (SAMO-TESTOWANIE Z 26 REGUŁAMI I MIERZENIEM CZASU)
+ * =========================================================================
+ */
+const TEST_DEFINITIONS = [
+  // 1. Oficjalne godziny graniczne i wyjątki
+  { h: 0, m: 0, fn: 'off', exp: 'Es ist null Uhr' },
+  { h: 1, m: 0, fn: 'off', exp: 'Es ist ein Uhr' }, // Ważna reguła ein vs eins!
+  { h: 1, m: 1, fn: 'off', exp: 'Es ist ein Uhr eins' },
+  { h: 1, m: 15, fn: 'off', exp: 'Es ist ein Uhr fünfzehn' },
+  { h: 1, m: 25, fn: 'off', exp: 'Es ist ein Uhr fünfundzwanzig' },
+  { h: 1, m: 30, fn: 'off', exp: 'Es ist ein Uhr dreißig' },
+  { h: 1, m: 35, fn: 'off', exp: 'Es ist ein Uhr fünfunddreißig' },
+  { h: 1, m: 45, fn: 'off', exp: 'Es ist ein Uhr fünfundvierzig' },
+  { h: 12, m: 0, fn: 'off', exp: 'Es ist zwölf Uhr' },
+  { h: 13, m: 0, fn: 'off', exp: 'Es ist dreizehn Uhr' },
+  { h: 17, m: 25, fn: 'off', exp: 'Es ist siebzehn Uhr fünfundzwanzig' },
+  { h: 23, m: 59, fn: 'off', exp: 'Es ist dreiundzwanzig Uhr neunundfünfzig' },
+
+  // 2. Styl potoczny (Viertel, halb, vor halb, nach halb)
+  { h: 1, m: 0, fn: 'cas', exp: 'Es ist eins' },
+  { h: 8, m: 0, fn: 'cas', exp: 'Es ist acht' },
+  { h: 8, m: 5, fn: 'cas', exp: 'Es ist fünf nach acht' },
+  { h: 8, m: 15, fn: 'cas', exp: 'Es ist Viertel nach acht' },
+  { h: 8, m: 20, fn: 'cas', exp: 'Es ist zwanzig nach acht' },
+  { h: 8, m: 25, fn: 'cas', exp: 'Es ist fünf vor halb neun' },
+  { h: 8, m: 30, fn: 'cas', exp: 'Es ist halb neun' },
+  { h: 8, m: 35, fn: 'cas', exp: 'Es istSchedule: fünf nach halb neun' }, // Test flag
+  { h: 8, m: 40, fn: 'cas', exp: 'Es ist zwanzig vor neun' },
+  { h: 8, m: 45, fn: 'cas', exp: 'Es ist Viertel vor neun' },
+  { h: 8, m: 50, fn: 'cas', exp: 'Es ist zehn vor neun' },
+  { h: 12, m: 30, fn: 'cas', exp: 'Es ist halb eins' },
+  { h: 0, m: 30, fn: 'cas', exp: 'Es ist halb eins' },
+  { h: 14, m: 15, fn: 'cas', exp: 'Es ist Viertel nach zwei' }
+];
+// Poprawienie oczekiwanego dla 8:35
+TEST_DEFINITIONS[19].exp = 'Es ist fünf nach halb neun';
+
+function runAutomatedDiagnostics() {
+  const startTime = performance.now();
+  const tableBody = document.getElementById("testTableBody");
+  tableBody.innerHTML = "";
+
+  let passed = 0;
+  let failed = 0;
+
+  TEST_DEFINITIONS.forEach(t => {
+    let actual = "";
+    if (t.fn === 'off') {
+      actual = toOfficialGerman(t.h, t.m);
+    } else {
+      actual = toCasualGerman(t.h, t.m).main;
+    }
+
+    const isMatch = (actual.trim() === t.exp.trim());
+    if (isMatch) passed++; else failed++;
+
+    const row = document.createElement("tr");
+    const hStr = t.h < 10 ? "0" + t.h : t.h;
+    const mStr = t.m < 10 ? "0" + t.m : t.m;
+
+    row.innerHTML = `
+      <td><b>${hStr}:${mStr}</b></td>
+      <td>${t.fn === 'off' ? 'Oficjalny' : 'Potoczny'}</td>
+      <td>${t.exp}</td>
+      <td>${actual}</td>
+      <td><span class="${isMatch ? 'badge-ok' : 'badge-err'}">${isMatch ? 'PASS' : 'FAIL'}</span></td>
+    `;
+    tableBody.appendChild(row);
+  });
+
+  // Dodatkowy test analizatora fraz
+  const parseTest = parseGermanTimePhrase("fünf vor halb acht");
+  const parseOk = (parseTest && parseTest.hour === 7 && parseTest.minute === 25);
+  if (parseOk) passed++; else failed++;
+
+  const parseRow = document.createElement("tr");
+  parseRow.innerHTML = `
+    <td><b>Parser</b></td>
+    <td>Tekst➔Czas</td>
+    <td>07:25 dla "fünf vor halb acht"</td>
+    <td>${parseTest ? `${parseTest.hour}:${parseTest.minute}` : 'Błąd'}</td>
+    <td><span class="${parseOk ? 'badge-ok' : 'badge-err'}">${parseOk ? 'PASS' : 'FAIL'}</span></td>
+  `;
+  tableBody.appendChild(parseRow);
+
+  const duration = (performance.now() - startTime).toFixed(1);
+  const meta = document.getElementById("testMetaInfo");
+  meta.innerHTML = `Zakończono w <b>${duration} ms</b>: <span style="color:var(--success); font-weight:800;">${passed} ZDANYCH</span> / <span style="color:${failed > 0 ? 'var(--danger)' : 'var(--text-muted)'}; font-weight:800;">${failed} BŁĘDÓW</span>`;
+}
+
+/**
+ * =========================================================================
+ * INICJALIZACJA ZDARZEŃ I START
+ * =========================================================================
+ */
+window.addEventListener("DOMContentLoaded", () => {
+  renderClockNumbers();
+  populateTimeDropdowns();
+  setupTabs();
+
+  // Domyślny czas: teraz
+  const now = new Date();
+  setAppTime(now.getHours(), now.getMinutes());
+
+  // Listenery dropdownów
+  document.getElementById("hourSelect").addEventListener("change", handleTimeSelectChange);
+  document.getElementById("minuteSelect").addEventListener("change", handleTimeSelectChange);
+
+  // Przycisk "Teraz"
+  document.getElementById("btnNow").addEventListener("click", () => {
+    const curr = new Date();
+    setAppTime(curr.getHours(), curr.getMinutes());
+  });
+
+  // Przyciski szybkich kafelków
+  document.querySelectorAll(".chip-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const h = parseInt(btn.getAttribute("data-h"), 10);
+      const m = parseInt(btn.getAttribute("data-m"), 10);
+      setAppTime(h, m);
+    });
+  });
+
+  // Przyciski wymowy lektora
+  document.getElementById("speakOfficialBtn").addEventListener("click", () => {
+    const text = document.getElementById("officialOutput").textContent;
+    speakGerman(text);
+  });
+  document.getElementById("speakCasualBtn").addEventListener("click", () => {
+    const text = document.getElementById("casualOutput").textContent;
+    speakGerman(text);
+  });
+
+  // Parser tekstu
+  document.getElementById("btnParseText").addEventListener("click", () => {
+    const val = document.getElementById("textInputGerman").value;
+    const resBox = document.getElementById("parseResultBox");
+    const valBox = document.getElementById("parsedDigitalVal");
+    const expBox = document.getElementById("parsedExplanationVal");
+
+    const parsed = parseGermanTimePhrase(val);
+    resBox.style.display = "block";
+
+    if (parsed) {
+      const hStr = parsed.hour < 10 ? "0" + parsed.hour : parsed.hour;
+      const mStr = parsed.minute < 10 ? "0" + parsed.minute : parsed.minute;
+      valBox.textContent = `${hStr}:${mStr}`;
+      valBox.style.color = "var(--primary)";
+      expBox.innerHTML = `Styl: <b>${parsed.mode}</b>. Zsynchronizowano z głównym zegarem!`;
+      setAppTime(parsed.hour, parsed.minute);
+    } else {
+      valBox.textContent = "Nie rozpoznano ❌";
+      valBox.style.color = "var(--danger)";
+      expBox.innerHTML = "Wskazówka: sprawdź pisownię, np. <i>Viertel nach drei</i>, <i>halb fünf</i>, <i>acht Uhr</i>.";
+    }
+  });
+
+  // Klawiatura kafelkowa dla tekstu
+  const textInput = document.getElementById("textInputGerman");
+  document.querySelectorAll(".word-key").forEach(k => {
+    if (k.id === "clearWordInput") {
+      k.addEventListener("click", () => { textInput.value = ""; });
+    } else {
+      k.addEventListener("click", () => {
+        const w = k.getAttribute("data-word");
+        textInput.value = textInput.value ? `${textInput.value} ${w}` : w;
+      });
+    }
+  });
+
+  // Obsługa quizu
+  document.getElementById("btnNextQuiz").addEventListener("click", generateNewQuizQuestion);
+  document.getElementById("btnPrintTest").addEventListener("click", () => window.print());
+
+  // Obsługa autotestu
+  document.getElementById("btnRunTests").addEventListener("click", runAutomatedDiagnostics);
+
+  // Monitor stanu online/offline
+  updateNetworkStatus();
+  window.addEventListener("online", updateNetworkStatus);
+  window.addEventListener("offline", updateNetworkStatus);
+
+  // Wykonaj autotest w tle bez opóźnień
+  setTimeout(runAutomatedDiagnostics, 100);
+});
+</script>
+</body>
+</html>
